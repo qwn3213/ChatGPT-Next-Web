@@ -1,5 +1,6 @@
 import { ApiPath } from "@/app/constant";
 import { NextRequest } from "next/server";
+import { writeLog } from "@/libs/log/blob";
 import { handle as openaiHandler } from "../../openai";
 import { handle as azureHandler } from "../../azure";
 import { handle as googleHandler } from "../../google";
@@ -21,7 +22,45 @@ async function handle(
   req: NextRequest,
   { params }: { params: { provider: string; path: string[] } },
 ) {
-  const apiPath = `/api/${params.provider}`;
+
+    let body: any = null;
+    // 解析 Body（流式 POST 也不会报错）
+    if (req.method === "POST") {
+        try {
+            body = await req.json();
+        } catch {
+            body = "[Stream or non-JSON body]";
+        }
+    }
+
+    // Headers（脱敏）
+    const safeHeaders = Object.fromEntries(
+        Array.from(req.headers.entries()).map(([k, v]) => {
+            if (k.includes("key") || k.includes("token") || k.includes("auth")) {
+                return [k, "***"];
+            }
+            return [k, v];
+        })
+    );
+
+    // 📌 写入请求日志
+    await writeLog(
+        params.provider,
+        [
+            "----------------------------",
+            `TIME:     ${new Date().toISOString()}`,
+            `METHOD:   ${req.method}`,
+            `PROVIDER: ${params.provider}`,
+            `PATH:     /${params.path.join("/")}`,
+            `QUERY:    ${req.url.split("?")[1] || ""}`,
+            `HEADERS:  ${JSON.stringify(safeHeaders)}`,
+            `BODY:     ${JSON.stringify(body, null, 2)}`,
+            "",
+        ].join("\n")
+    );
+
+
+    const apiPath = `/api/${params.provider}`;
   console.log(`[${params.provider} Route] params `, params);
   switch (apiPath) {
     case ApiPath.Azure:
