@@ -1,6 +1,6 @@
 import { ApiPath } from "@/app/constant";
 import { NextRequest } from "next/server";
-import { writeLog } from "@/libs/log/blob";
+import { writeLog } from "@/app/lib/log/blob";
 import { handle as openaiHandler } from "../../openai";
 import { handle as azureHandler } from "../../azure";
 import { handle as googleHandler } from "../../google";
