@@ -26,7 +26,7 @@ async function handle(
     const logReq = req.clone();
     if (logReq.method === "POST") {
         try {
-            let body = await logReq.text();
+            let body = await logReq.json();
             await writeLog(
                 params.provider,
                 [
