@@ -23,35 +23,26 @@ async function handle(
   { params }: { params: { provider: string; path: string[] } },
 ) {
 
-    let body: any = null;
-    // 克隆 request，日志读取用
     const logReq = req.clone();
-
-    // 把 body 作为字符串读取（避免二次 JSON 解析）
-    // 解析 Body（流式 POST 也不会报错）
-    if (req.method === "POST") {
+    if (logReq.method === "POST") {
         try {
-            body = await logReq.json();
+            let body = logReq.text();
+            await writeLog(
+                params.provider,
+                [
+                    "----------------------------",
+                    `TIME:     ${new Date().toISOString()}`,
+                    `PATH:     /${params.path.join("/")}`,
+                    `BODY:     ${JSON.stringify(body, null, 2)}`,
+                    "",
+                ].join("\n")
+            );
         } catch {
-            body = "[Stream or non-JSON body]";
         }
     }
 
 
-    // 📌 写入请求日志
-    await writeLog(
-        params.provider,
-        [
-            "----------------------------",
-            `TIME:     ${new Date().toISOString()}`,
-            `PROVIDER: ${params.provider}`,
-            `BODY:     ${JSON.stringify(body, null, 2)}`,
-            "",
-        ].join("\n")
-    );
-
-
-    const apiPath = `/api/${params.provider}`;
+  const apiPath = `/api/${params.provider}`;
   console.log(`[${params.provider} Route] params `, params);
   switch (apiPath) {
     case ApiPath.Azure:
