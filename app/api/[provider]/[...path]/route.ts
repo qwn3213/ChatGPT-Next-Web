@@ -41,7 +41,6 @@ async function handle(
                 time,
                 params.provider,
                 [
-                    "----------------------------",
                     `TIME:     ${time}`,
                     `PATH:     /${params.path.join("/")}`,
                     `BODY:     ${JSON.stringify(body, null, 2)}`,
