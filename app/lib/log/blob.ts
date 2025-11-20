@@ -13,7 +13,7 @@ export async function writeLog(provider: string, content: string) {
     const newContent = previous + "\n" + content;
 
     await put(fileName, newContent, {
-        access: "private",
+        access: "public-read",
     });
 
     return fileName;
