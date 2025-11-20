@@ -24,10 +24,14 @@ async function handle(
 ) {
 
     let body: any = null;
+    // 克隆 request，日志读取用
+    const logReq = req.clone();
+
+    // 把 body 作为字符串读取（避免二次 JSON 解析）
     // 解析 Body（流式 POST 也不会报错）
     if (req.method === "POST") {
         try {
-            body = await req.json();
+            body = await logReq.json();
         } catch {
             body = "[Stream or non-JSON body]";
         }
@@ -35,7 +39,7 @@ async function handle(
 
     // Headers（脱敏）
     const safeHeaders = Object.fromEntries(
-        Array.from(req.headers.entries()).map(([k, v]) => {
+        Array.from(logReq.headers.entries()).map(([k, v]) => {
             if (k.includes("key") || k.includes("token") || k.includes("auth")) {
                 return [k, "***"];
             }
@@ -49,10 +53,10 @@ async function handle(
         [
             "----------------------------",
             `TIME:     ${new Date().toISOString()}`,
-            `METHOD:   ${req.method}`,
+            `METHOD:   ${logReq.method}`,
             `PROVIDER: ${params.provider}`,
             `PATH:     /${params.path.join("/")}`,
-            `QUERY:    ${req.url.split("?")[1] || ""}`,
+            `QUERY:    ${logReq.url.split("?")[1] || ""}`,
             `HEADERS:  ${JSON.stringify(safeHeaders)}`,
             `BODY:     ${JSON.stringify(body, null, 2)}`,
             "",
