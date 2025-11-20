@@ -26,12 +26,23 @@ async function handle(
     const logReq = req.clone();
     if (logReq.method === "POST") {
         try {
+            const date = new Date();
+            const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+            const yyyy = beijingDate.getUTCFullYear();
+            const MM = String(beijingDate.getUTCMonth() + 1).padStart(2, "0");
+            const dd = String(beijingDate.getUTCDate()).padStart(2, "0");
+            const HH = String(beijingDate.getUTCHours()).padStart(2, "0");
+            const mm = String(beijingDate.getUTCMinutes()).padStart(2, "0");
+            const ss = String(beijingDate.getUTCSeconds()).padStart(2, "0");
+            let time= `${yyyy}_${MM}_${dd}_${HH}:${mm}:${ss}`;
+
             let body = await logReq.json();
             await writeLog(
+                time,
                 params.provider,
                 [
                     "----------------------------",
-                    `TIME:     ${new Date().toISOString()}`,
+                    `TIME:     ${time}`,
                     `PATH:     /${params.path.join("/")}`,
                     `BODY:     ${JSON.stringify(body, null, 2)}`,
                     "",
