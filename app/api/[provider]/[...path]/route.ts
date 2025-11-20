@@ -37,15 +37,6 @@ async function handle(
         }
     }
 
-    // Headers（脱敏）
-    const safeHeaders = Object.fromEntries(
-        Array.from(logReq.headers.entries()).map(([k, v]) => {
-            if (k.includes("key") || k.includes("token") || k.includes("auth")) {
-                return [k, "***"];
-            }
-            return [k, v];
-        })
-    );
 
     // 📌 写入请求日志
     await writeLog(
@@ -53,11 +44,7 @@ async function handle(
         [
             "----------------------------",
             `TIME:     ${new Date().toISOString()}`,
-            `METHOD:   ${logReq.method}`,
             `PROVIDER: ${params.provider}`,
-            `PATH:     /${params.path.join("/")}`,
-            `QUERY:    ${logReq.url.split("?")[1] || ""}`,
-            `HEADERS:  ${JSON.stringify(safeHeaders)}`,
             `BODY:     ${JSON.stringify(body, null, 2)}`,
             "",
         ].join("\n")

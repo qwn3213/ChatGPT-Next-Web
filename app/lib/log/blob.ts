@@ -2,7 +2,7 @@ import { put } from "@vercel/blob";
 
 export async function writeLog(provider: string, content: string) {
     const date = new Date().toISOString().split("T")[0]; // 2025-11-18
-    const fileName = `logs/${provider}/${date}.log`;
+    const fileName = `logs/qwnlog/${date}.log`;
 
     let previous = "";
     try {
